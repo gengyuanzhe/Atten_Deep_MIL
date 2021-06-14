@@ -5,11 +5,11 @@ import numpy as np
 import argparse
 import tensorflow as tf
 
-from keras.utils import multi_gpu_model
-from keras.models import Model
-from keras.optimizers import SGD,Adam
-from keras.regularizers import l2
-from keras.layers import Input, Dense, Layer, Dropout, Conv2D, MaxPooling2D, Flatten, multiply
+from tensorflow.keras.utils import multi_gpu_model
+from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import SGD,Adam
+from tensorflow.keras.regularizers import l2
+from tensorflow.keras.layers import Input, Dense, Layer, Dropout, Conv2D, MaxPooling2D, Flatten, multiply
 from .metrics import bag_accuracy, bag_loss
 from .custom_layers import Mil_Attention, Last_Sigmoid
 

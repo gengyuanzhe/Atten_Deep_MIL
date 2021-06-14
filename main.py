@@ -13,16 +13,18 @@ import time
 from utl import Cell_Net
 from random import shuffle
 import argparse
-from keras.models import Model
+from tensorflow.keras.models import Model
 from utl.dataset import load_dataset
 from utl.data_aug_op import random_flip_img, random_rotate_img
 import glob
 import scipy.misc as sci
+import imageio
+
 import tensorflow as tf
 
-from keras import backend as K
-from keras.utils import multi_gpu_model
-from keras.callbacks import ModelCheckpoint, LearningRateScheduler, TensorBoard, EarlyStopping
+from tensorflow.keras import backend as K
+from tensorflow.keras.utils import multi_gpu_model
+from tensorflow.keras.callbacks import ModelCheckpoint, LearningRateScheduler, TensorBoard, EarlyStopping
 
 import matplotlib.pyplot as plt
 
@@ -77,7 +79,7 @@ def generate_batch(path):
         else:
             curr_label = np.zeros(num_ins, dtype=np.uint8)
         for each_img in img_path:
-            img_data = np.asarray(sci.imread(each_img), dtype=np.float32)
+            img_data = np.asarray(imageio.imread(each_img), dtype=np.float32)
             #img_data -= 255
             img_data[:, :, 0] -= 123.68
             img_data[:, :, 1] -= 116.779

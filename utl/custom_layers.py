@@ -1,6 +1,6 @@
-from keras.layers import Layer
-from keras import backend as K
-from keras import activations, initializers, regularizers
+from tensorflow.keras.layers import Layer
+from tensorflow.keras import backend as K
+from tensorflow.keras import activations, initializers, regularizers
 
 class Mil_Attention(Layer):
     """
@@ -38,7 +38,7 @@ class Mil_Attention(Layer):
         assert len(input_shape) == 2
         input_dim = input_shape[1]
 
-        self.V = self.add_weight(shape=(input_dim, self.L_dim),
+        self.V = self.add_weight(shape=(int(input_dim), self.L_dim),
                                       initializer=self.v_init,
                                       name='v',
                                       regularizer=self.v_regularizer,
@@ -53,7 +53,7 @@ class Mil_Attention(Layer):
 
 
         if self.use_gated:
-            self.U = self.add_weight(shape=(input_dim, self.L_dim),
+            self.U = self.add_weight(shape=(int(input_dim), self.L_dim),
                                      initializer=self.u_init,
                                      name='U',
                                      regularizer=self.u_regularizer,
@@ -91,10 +91,10 @@ class Mil_Attention(Layer):
     def get_config(self):
         config = {
             'output_dim': self.output_dim,
-            'v_initializer': initializers.serialize(self.V.initializer),
-            'w_initializer': initializers.serialize(self.w.initializer),
-            'v_regularizer': regularizers.serialize(self.v_regularizer),
-            'w_regularizer': regularizers.serialize(self.w_regularizer),
+            # 'v_initializer': initializers.serialize(self.V.initializer),
+            # 'w_initializer': initializers.serialize(self.w.initializer),
+            # 'v_regularizer': regularizers.serialize(self.v_regularizer),
+            # 'w_regularizer': regularizers.serialize(self.w_regularizer),
             'use_bias': self.use_bias
         }
         base_config = super(Mil_Attention, self).get_config()
@@ -144,7 +144,7 @@ class Last_Sigmoid(Layer):
         assert len(input_shape) == 2
         input_dim = input_shape[1]
 
-        self.kernel = self.add_weight(shape=(input_dim, self.output_dim),
+        self.kernel = self.add_weight(shape=(int(input_dim), self.output_dim),
                                         initializer=self.kernel_initializer,
                                         name='kernel',
                                         regularizer=self.kernel_regularizer)
@@ -182,10 +182,10 @@ class Last_Sigmoid(Layer):
     def get_config(self):
         config = {
             'output_dim': self.output_dim,
-            'kernel_initializer': initializers.serialize(self.kernel.initializer),
-            'bias_initializer': initializers.serialize(self.bias_initializer),
-            'kernel_regularizer': regularizers.serialize(self.kernel_regularizer),
-            'bias_regularizer': regularizers.serialize(self.bias_regularizer),
+            # 'kernel_initializer': initializers.serialize(self.kernel.initializer),
+            # 'bias_initializer': initializers.serialize(self.bias_initializer),
+            # 'kernel_regularizer': regularizers.serialize(self.kernel_regularizer),
+            # 'bias_regularizer': regularizers.serialize(self.bias_regularizer),
             'use_bias': self.use_bias
         }
         base_config = super(Last_Sigmoid, self).get_config()
