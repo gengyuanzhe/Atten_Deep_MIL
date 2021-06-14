@@ -170,7 +170,6 @@ class Last_Sigmoid(Layer):
         # sigmoid
         out = K.sigmoid(x)
 
-
         return out
 
     def compute_output_shape(self, input_shape):
@@ -191,3 +190,92 @@ class Last_Sigmoid(Layer):
         base_config = super(Last_Sigmoid, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
+
+class LastSoftmax(Layer):
+    """
+    Attention Activation
+
+    This layer contains a FC layer which only has one neural with sigmoid actiavtion
+    and MIL pooling. The input of this layer is instance features. Then we obtain
+    instance scores via this FC layer. And use MIL pooling to aggregate instance scores
+    into bag score that is the output of Score pooling layer.
+    This layer is used in mi-Net.
+
+    # Arguments
+        output_dim: Positive integer, dimensionality of the output space
+        kernel_initializer: Initializer of the `kernel` weights matrix
+        bias_initializer: Initializer of the `bias` weights
+        kernel_regularizer: Regularizer function applied to the `kernel` weights matrix
+        bias_regularizer: Regularizer function applied to the `bias` weights
+        use_bias: Boolean, whether use bias or not
+        pooling_mode: A string,
+                      the mode of MIL pooling method, like 'max' (max pooling),
+                      'ave' (average pooling), 'lse' (log-sum-exp pooling)
+
+    # Input shape
+        2D tensor with shape: (batch_size, input_dim)
+    # Output shape
+        2D tensor with shape: (1, units)
+    """
+
+    def __init__(self, output_dim, kernel_initializer='glorot_uniform', bias_initializer='zeros',
+                 kernel_regularizer=None, bias_regularizer=None,
+                 use_bias=True, **kwargs):
+        self.output_dim = output_dim
+
+        self.kernel_initializer = initializers.get(kernel_initializer)
+        self.bias_initializer = initializers.get(bias_initializer)
+        self.kernel_regularizer = regularizers.get(kernel_regularizer)
+        self.bias_regularizer = regularizers.get(bias_regularizer)
+
+        self.use_bias = use_bias
+        super(LastSoftmax, self).__init__(**kwargs)
+
+    def build(self, input_shape):
+        assert len(input_shape) == 2
+        input_dim = input_shape[1]
+
+        self.kernel = self.add_weight(shape=(int(input_dim), self.output_dim),
+                                      initializer=self.kernel_initializer,
+                                      name='kernel',
+                                      regularizer=self.kernel_regularizer)
+
+        if self.use_bias:
+            self.bias = self.add_weight(shape=(self.output_dim,),
+                                        initializer=self.bias_initializer,
+                                        name='bias',
+                                        regularizer=self.bias_regularizer)
+        else:
+            self.bias = None
+
+        self.input_built = True
+
+    def call(self, x, mask=None):
+        n, d = x.shape
+        x = K.sum(x, axis=0, keepdims=True)
+        # compute instance-level score
+        x = K.dot(x, self.kernel)
+        if self.use_bias:
+            x = K.bias_add(x, self.bias)
+
+        # softmax
+        out = K.softmax(x)
+        return out
+
+    def compute_output_shape(self, input_shape):
+        shape = list(input_shape)
+        assert len(shape) == 2
+        shape[1] = self.output_dim
+        return tuple(shape)
+
+    def get_config(self):
+        config = {
+            'output_dim': self.output_dim,
+            # 'kernel_initializer': initializers.serialize(self.kernel.initializer),
+            # 'bias_initializer': initializers.serialize(self.bias_initializer),
+            # 'kernel_regularizer': regularizers.serialize(self.kernel_regularizer),
+            # 'bias_regularizer': regularizers.serialize(self.bias_regularizer),
+            'use_bias': self.use_bias
+        }
+        base_config = super(LastSoftmax, self).get_config()
+        return dict(list(base_config.items()) + list(config.items()))

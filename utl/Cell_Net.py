@@ -11,7 +11,8 @@ from tensorflow.keras.optimizers import SGD,Adam
 from tensorflow.keras.regularizers import l2
 from tensorflow.keras.layers import Input, Dense, Layer, Dropout, Conv2D, MaxPooling2D, Flatten, multiply
 from .metrics import bag_accuracy, bag_loss
-from .custom_layers import Mil_Attention, Last_Sigmoid
+from .custom_layers import Mil_Attention, Last_Sigmoid, LastSoftmax
+
 
 def cell_net(input_dim, args, useMulGpu=False):
 
@@ -38,20 +39,26 @@ def cell_net(input_dim, args, useMulGpu=False):
     alpha = Mil_Attention(L_dim=128, output_dim=1, kernel_regularizer=l2(weight_decay), name='alpha', use_gated=args.useGated)(fc2)
     x_mul = multiply([alpha, fc2])
 
-    out = Last_Sigmoid(output_dim=1, name='FC1_sigmoid')(x_mul)
+    out = LastSoftmax(output_dim=2, name='softmax')(x_mul)
     #
     model = Model(inputs=[data_input], outputs=[out])
 
     # model.summary()
+    #
+    # if useMulGpu == True:
+    #     parallel_model = multi_gpu_model(model, gpus=2)
+    #     parallel_model.compile(optimizer=Adam(lr=lr, beta_1=0.9, beta_2=0.999), loss=bag_loss, metrics=[bag_accuracy])
+    # else:
+    #     model.compile(optimizer=Adam(lr=lr, beta_1=0.9, beta_2=0.999), loss=bag_loss, metrics=[bag_accuracy])
+    #     parallel_model = model
 
-    if useMulGpu == True:
+    if useMulGpu:
         parallel_model = multi_gpu_model(model, gpus=2)
-        parallel_model.compile(optimizer=Adam(lr=lr, beta_1=0.9, beta_2=0.999), loss=bag_loss, metrics=[bag_accuracy])
+        parallel_model.compile(optimizer=Adam(lr=lr, beta_1=0.9, beta_2=0.999), loss='categorical_crossentropy',
+                               metrics=['categorical_accuracy'])
     else:
-        model.compile(optimizer=Adam(lr=lr, beta_1=0.9, beta_2=0.999), loss=bag_loss, metrics=[bag_accuracy])
+        model.compile(optimizer=Adam(lr=lr, beta_1=0.9, beta_2=0.999), loss='categorical_crossentropy',
+                      metrics=['categorical_accuracy'])
         parallel_model = model
 
     return parallel_model
-
-
-

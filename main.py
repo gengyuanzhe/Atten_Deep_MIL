@@ -19,7 +19,7 @@ from utl.data_aug_op import random_flip_img, random_rotate_img
 import glob
 import scipy.misc as sci
 import imageio
-
+from tensorflow.keras.utils import to_categorical
 import tensorflow as tf
 
 from tensorflow.keras import backend as K
@@ -43,7 +43,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Train a Attention-based Deep MIL')
     parser.add_argument('--lr', dest='init_lr',
                         help='initial learning rate',
-                        default=1e-4, type=float)
+                        default=1e-5, type=float)
     parser.add_argument('--decay', dest='weight_decay',
                         help='weight decay',
                         default=0.0005, type=float)
@@ -78,6 +78,8 @@ def generate_batch(path):
             curr_label = np.ones(num_ins,dtype=np.uint8)
         else:
             curr_label = np.zeros(num_ins, dtype=np.uint8)
+
+        curr_label = to_categorical(curr_label, 2)
         for each_img in img_path:
             img_data = np.asarray(imageio.imread(each_img), dtype=np.float32)
             #img_data -= 255
@@ -230,7 +232,6 @@ def model_training(input_dim, dataset, irun, ifold):
     print ('test_acc={:.3f}'.format(test_acc))
 
     return test_acc
-
 
 
 if __name__ == "__main__":
