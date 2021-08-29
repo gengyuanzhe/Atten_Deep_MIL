@@ -15,7 +15,7 @@ if __name__ == '__main__':
     model.load_weights("Saved_model/_Batch_size_1epoch_best.hd5")
     print(model.summary())
 
-    test_bags = load_dataset_test(dataset_path="/home/wf/code/data/Patches", n_folds=5, rand_state=1)
+    test_bags = load_dataset_test(dataset_path="/media/wf/移动盘3/中大前列腺癌数据/train/attention", n_folds=5, rand_state=1)
 
     # convert bag to batch
     test_set = generate_batch(test_bags)

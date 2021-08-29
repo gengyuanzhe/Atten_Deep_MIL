@@ -72,7 +72,7 @@ def generate_batch(path):
     for each_path in path:
         name_img = []
         img = []
-        img_path = glob.glob(each_path + '/*.bmp')
+        img_path = glob.glob(each_path + '/*')
         num_ins = len(img_path)
 
         label = int(each_path.split('/')[-2])
@@ -211,21 +211,24 @@ def model_training(input_dim, dataset, irun, ifold):
     test_bags = dataset['test']
 
     # convert bag to batch
+    print("start generate batch")
     train_set = generate_batch(train_bags)
     test_set = generate_batch(test_bags)
-
+    print('test_set size=%d' % len(test_set))
+    print("start load net")
     model = Cell_Net.cell_net(input_dim, args, use_mul_gpu=False)
-    print_layer_trainable(model)
 
     # train model
     t1 = time.time()
     num_batch = len(train_set)
     # for epoch in range(args.max_epoch):
+    print("start train_eval")
     model_name = train_eval(model, train_set, irun, ifold)
 
     print("load saved model weights")
     model.load_weights(model_name)
 
+    print("start test_val")
     test_loss, test_acc = test_eval(model, test_set)
 
     t2 = time.time()
