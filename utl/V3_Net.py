@@ -47,7 +47,8 @@ def cell_net(input_dim, args, use_mul_gpu=False):
         parallel_model.compile(optimizer=Adam(lr=lr, beta_1=0.9, beta_2=0.999), loss='categorical_crossentropy',
                                metrics=['categorical_accuracy'])
     else:
-        model.compile(optimizer=Adam(lr=lr, beta_1=0.9, beta_2=0.999), loss='categorical_crossentropy',
+        print("use sgd optimizer")
+        model.compile(optimizer=SGD(lr=0.001, momentum=0.9, decay=0.9), loss='categorical_crossentropy',
                       metrics=['categorical_accuracy'])
         parallel_model = model
 

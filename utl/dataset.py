@@ -13,8 +13,8 @@ def load_dataset(dataset_path, n_folds, rand_state):
     """
 
     # load datapath from path
-    pos_path = glob.glob(dataset_path+'/1/img*')
-    neg_path = glob.glob(dataset_path+'/0/img*')
+    pos_path = glob.glob(dataset_path+'/1/*')
+    neg_path = glob.glob(dataset_path+'/0/*')
 
     pos_num = len(pos_path)
     neg_num = len(neg_path)

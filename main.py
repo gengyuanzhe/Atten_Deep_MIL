@@ -45,7 +45,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Train a Attention-based Deep MIL')
     parser.add_argument('--lr', dest='init_lr',
                         help='initial learning rate',
-                        default=1e-5, type=float)
+                        default=1e-7, type=float)
     parser.add_argument('--decay', dest='weight_decay',
                         help='weight decay',
                         default=0.0005, type=float)
@@ -70,9 +70,10 @@ def parse_args():
 def generate_batch(path):
     bags = []
     for each_path in path:
+        # print(f"generate {each_path}")
         name_img = []
         img = []
-        img_path = glob.glob(each_path + '/*.bmp')
+        img_path = glob.glob(each_path + '/*')
         num_ins = len(img_path)
 
         label = int(each_path.split('/')[-2])
@@ -211,21 +212,24 @@ def model_training(input_dim, dataset, irun, ifold):
     test_bags = dataset['test']
 
     # convert bag to batch
+    print("start generate batch")
     train_set = generate_batch(train_bags)
     test_set = generate_batch(test_bags)
-
-    model = V3_Net.cell_net(input_dim, args, use_mul_gpu=False)
-    print_layer_trainable(model)
+    print('test_set size=%d' % len(test_set))
+    print("start load net")
+    model = Cell_Net.cell_net(input_dim, args, use_mul_gpu=False)
 
     # train model
     t1 = time.time()
     num_batch = len(train_set)
     # for epoch in range(args.max_epoch):
+    print("start train_eval")
     model_name = train_eval(model, train_set, irun, ifold)
 
     print("load saved model weights")
     model.load_weights(model_name)
 
+    print("start test_val")
     test_loss, test_acc = test_eval(model, test_set)
 
     t2 = time.time()
@@ -242,12 +246,13 @@ if __name__ == "__main__":
     print('Called with args:')
     print(args)
 
-    input_dim = (299, 299, 3)
+    input_dim = (27, 27, 3)
 
     run = 1
-    n_folds = 10
+    n_folds = 5
     acc = np.zeros((run, n_folds), dtype=float)
-    data_path = '../data/Patches'
+    # data_path = '/media/wf/移动盘3/中大前列腺癌数据/train_5/attention'
+    data_path = '/home/wf/code/data/Patches'
 
     for irun in range(run):
         dataset = load_dataset(dataset_path=data_path, n_folds=n_folds, rand_state=irun)
