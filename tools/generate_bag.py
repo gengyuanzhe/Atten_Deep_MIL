@@ -8,7 +8,7 @@ mag = '5.0'
 src_dir = '/media/wf/移动盘3/中大前列腺癌数据/tile/0'
 target_dir = '/media/wf/移动盘3/中大前列腺癌数据/train_5/attention/0'
 
-# 一个目录升恒的bag数
+# 一个目录升的bag数
 bag_num = 5
 bag_pic_num = 50
 bag_pic_rate = 0.8
