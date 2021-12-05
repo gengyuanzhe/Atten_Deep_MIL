@@ -14,7 +14,7 @@ from .metrics import bag_accuracy, bag_loss
 from .custom_layers import Mil_Attention, Last_Sigmoid, LastSoftmax
 
 
-def cell_net(input_dim, args, useMulGpu=False):
+def cell_net(input_dim, args, use_mul_gpu=False):
 
     lr = args.init_lr
     weight_decay = args.init_lr
@@ -52,7 +52,7 @@ def cell_net(input_dim, args, useMulGpu=False):
     #     model.compile(optimizer=Adam(lr=lr, beta_1=0.9, beta_2=0.999), loss=bag_loss, metrics=[bag_accuracy])
     #     parallel_model = model
 
-    if useMulGpu:
+    if use_mul_gpu:
         parallel_model = multi_gpu_model(model, gpus=2)
         parallel_model.compile(optimizer=Adam(lr=lr, beta_1=0.9, beta_2=0.999), loss='categorical_crossentropy',
                                metrics=['categorical_accuracy'])

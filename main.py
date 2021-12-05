@@ -180,8 +180,8 @@ def train_eval(model, train_set, irun, ifold):
     train_loss = history.history['loss']
     val_loss = history.history['val_loss']
 
-    train_acc = history.history['bag_accuracy']
-    val_acc = history.history['val_bag_accuracy']
+    train_acc = history.history['categorical_accuracy']
+    val_acc = history.history['val_categorical_accuracy']
 
     fig = plt.figure()
     plt.plot(train_loss)
@@ -214,7 +214,7 @@ def model_training(input_dim, dataset, irun, ifold):
     train_set = generate_batch(train_bags)
     test_set = generate_batch(test_bags)
 
-    model = V3_Net.cell_net(input_dim, args, use_mul_gpu=False)
+    model = Cell_Net.cell_net(input_dim, args, use_mul_gpu=False)
     print_layer_trainable(model)
 
     # train model
@@ -242,7 +242,7 @@ if __name__ == "__main__":
     print('Called with args:')
     print(args)
 
-    input_dim = (299, 299, 3)
+    input_dim = (27, 27, 3)
 
     run = 1
     n_folds = 10

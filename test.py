@@ -11,7 +11,7 @@ if __name__ == '__main__':
     input_dim = (27, 27, 3)
     args = parse_args()
 
-    model = Cell_Net.cell_net(input_dim, args, useMulGpu=False)
+    model = Cell_Net.cell_net(input_dim, args, use_mul_gpu=False)
     model.load_weights("Saved_model/_Batch_size_1epoch_best.hd5")
     print(model.summary())
 
